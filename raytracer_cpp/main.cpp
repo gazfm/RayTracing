@@ -114,10 +114,11 @@ vec3 TraceRay(const vec3& rayorig, const vec3 &raydir, const int depth)
             auto intensity = std::max(glm::dot(normal, rayFrom), 0.0f);
             color += albedo * light->GetMaterial(vec3(0, 0, 0)).emissive * intensity;
 
-            auto reflection = glm::reflect(raydir, normal);
+            auto reflection = glm::normalize(glm::reflect(raydir, normal));
             auto specular_intensity = glm::dot(reflection, rayFrom);
-            specular_intensity = specular_intensity * specular_intensity;
-            color += obj->GetMaterial(vec3(0, 0, 0)).specular * specular_intensity;
+            if (specular_intensity < 0) specular_intensity = 0;
+            specular_intensity = pow(specular_intensity, 7.0f);
+            color += obj->GetMaterial(vec3(0, 0, 0)).specular * light->GetMaterial(vec3(0, 0, 0)).emissive * specular_intensity;
         }
     }
 
